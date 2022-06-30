@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\HomeController;
+use App\Http\Controllers\Admin\KanbanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::controller(HomeController::class)->name('web.')->group(function () {
+Route::controller(KanbanController::class)->name('web.')->group(function () {
         Route::get('/', 'index')->name('index');
 });
