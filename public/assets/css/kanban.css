@@ -1,0 +1,94 @@
+/*
+    Created on : 12/07/2019, 08:42:10
+    Author     : Sandro Alves Peres
+*/
+
+body {
+    padding-top: 13px;
+    background-color: #f7f7f7;
+}
+
+@media (min-width: 992px)
+{
+    body {
+        padding: 25px;
+        padding-top: 30px;
+    }
+}
+
+.badge-num-cards {
+    background-color: #e6ef6b !important;
+    margin-left: 4px;
+    border: 1px solid #adbcde;
+    color: #1b6d85 !important;
+}
+.card-colunas {
+    margin-top: 10px;
+}
+.coluna > .panel-body {
+    padding: 6px;
+}
+.card {
+    margin-bottom: 0;
+    border-color: #a6c5da;
+    color: #64646f;
+    position: relative;
+}
+.card:not(:last-child) {
+    margin-bottom: 6px;
+}
+.card > .panel-body {
+    padding: 12px;
+    min-height: 95px;
+}
+.card > .panel-footer {
+    min-height: 41px;
+}
+.card h5 {
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.wrapper-professores {
+    margin-top: 5px;
+}
+.wrapper-professores > .label {
+    background-color: #778f94;
+}
+
+.label-num-aula,
+.label-ano {
+    position: absolute;
+    right: 2px;
+    -webkit-border-top-right-radius: 0;
+    -webkit-border-bottom-right-radius: 0;
+    -moz-border-radius-topright: 0;
+    -moz-border-radius-bottomright: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.label-num-aula {
+    top: 0;
+    font-size: 1.5em;
+}
+.label-ano {
+    top: 35px;
+}
+.aulao,
+.aulao .panel-footer {
+    background-color: #f1f1be;
+}
+.aulao h5 {
+    color: #387b56;
+}
+.aulao h5::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background-color: #387b56;
+    display: inline-block;
+    margin-right: 3px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+}
