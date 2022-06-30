@@ -6,7 +6,12 @@
             <div class="form-group">
                 <label class="control-label">Curso</label>
                 <select id="select-filtro-curso" class="form-control">
-                    <option value=""></option>
+                    <option value="" readonly>Todos</option>
+                    @if (!empty($courses))
+                        @foreach ($courses as $course)
+                            <option value="{{ $course->id_curso }}">{{ $course->curso }}</option>
+                        @endforeach
+                    @endif
                 </select>
             </div>
         </div>
@@ -14,7 +19,12 @@
             <div class="form-group">
                 <label class="control-label">Nº Aula</label>
                 <select id="select-filtro-num-aula" class="form-control">
-                    <option value=""></option>
+                    <option value="" readonly>Todos</option>
+                    @if (!empty($num_classes))
+                        @foreach ($num_classes as $num_classe)
+                            <option value="{{ $num_classe->total }}">A{{ $num_classe->total }}</option>
+                        @endforeach
+                    @endif
                 </select>
             </div>
         </div>
@@ -52,27 +62,28 @@
     </div>
 
     <div class="row card-colunas">
-        <div class="col-sm-6 col-md-3">
 
-            <!-- DEMANDA -->
-            <!-- *************************************************** -->
+        @if (!empty($statuses))
+            @foreach ($statuses as $status)
+                <div class="col-sm-6 col-md-3">
 
-            <div class="panel panel-primary coluna">
-                <div class="panel-heading">
-                    <p class="panel-title">
-                        Demanda
-                        <span class="badge badge-num-cards">3</span>
-                    </p>
+                    <div class="panel panel-primary coluna">
+                        <div class="panel-heading">
+                            <p class="panel-title">
+                                {{ $status->status }}
+                                <span class="badge badge-num-cards">{{ $status->total_cards }}</span>
+                            </p>
+                        </div>
+                        <div id="cards-{{ $status->id_status }}" class="panel-body">
+                            @include('admin.kanban.includes.card')
+                        </div>
+                    </div>
+
                 </div>
-                <div id="cards-demanda" class="panel-body">
-
-                    <? include './cards.php'; ?>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="col-sm-6 col-md-3">
+            @endforeach
+        @endif
+        
+        {{-- <div class="col-sm-6 col-md-3">
 
             <!-- MATERIAL RECEBIDO -->
             <!-- *************************************************** -->
@@ -86,7 +97,7 @@
                 </div>
                 <div id="cards-material-recebido" class="panel-body">
 
-                    <? include './cards.php'; ?>
+                    @include('admin.kanban.includes.card')
 
                 </div>
             </div>
@@ -106,7 +117,7 @@
                 </div>
                 <div id="cards-em-conferencia" class="panel-body">
 
-                    <? include './cards.php'; ?>
+                    @include('admin.kanban.includes.card')
 
                 </div>
             </div>
@@ -126,11 +137,11 @@
                 </div>
                 <div id="cards-conferido" class="panel-body">
 
-                    <? include './cards.php'; ?>
+                    @include('admin.kanban.includes.card')
 
                 </div>
-            </div>
+            </div> 
 
-        </div>
+        </div> --}}
     </div>
 @endsection
