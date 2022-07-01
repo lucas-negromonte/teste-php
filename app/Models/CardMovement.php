@@ -23,6 +23,7 @@ class CardMovement extends Model
      */
     protected $fillable = [
         'id_card',
-        'id_status'
+        'id_status',
+        'dt_registro'
     ];
 }

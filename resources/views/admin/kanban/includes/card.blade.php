@@ -42,7 +42,7 @@
                             @if ($status->id_status < $last_status)
                                 <li role="separator" class="divider"></li>
                                 <li>
-                                    <a style="cursor: pointer" data-id="{{ $card->id_card }}" data-update="true"
+                                    <a style="cursor: pointer"  data-id_professor="{{ ($card->id_professor ?? null) }}" data-id="{{ $card->id_card }}" data-update="true"
                                         data-action="next" data-url="{{ route('web.index.update') }}">
                                         &raquo; Prosseguir</a>
                                 </li>
@@ -51,7 +51,8 @@
                                 <li role="separator" class="divider"></li>
                                 <li>
                                     <a style="cursor: pointer" data-id="{{ $card->id_card }}" data-update="true"
-                                        data-action="back" data-url="{{ route('web.index.update') }}">
+                                        data-action="back" data-id_professor="{{ ($card->id_professor ?? null) }}"
+                                        data-url="{{ route('web.index.update') }}">
                                         &laquo; Voltar</a>
                                 </li>
                             @endif
