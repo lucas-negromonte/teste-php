@@ -13,11 +13,23 @@ use Illuminate\Http\Request;
 class KanbanController extends Controller
 {
 
-
-    public function getApp($data = null)
+    /**
+     * Mostrar aplicação - cards Ajax
+     *
+     * @return void
+     */
+    public function getApp()
     {
+        $data = $_POST;
+        $order = ($data['order'] ?? null);
+        $order_type = ($data['order_type'] ?? null);
+        $num_aula = (int)($data['num_aula'] ?? null);
+        $id_curso = (int)($data['id_curso'] ?? null);
+        $teacher = ($data['professor'] ?? null);
+
+
         $statuses = (new Status)->getWithTheTotal();
-        $cards = (new Kanban)->getAllCards();
+        $cards = (new Kanban)->getAllCards($order, $order_type, $num_aula, $id_curso, $teacher);
         $html = Kanban::cards($cards, $statuses);
         $json['html']['#app'] =  $html;
         echo json_encode($json);
@@ -28,7 +40,7 @@ class KanbanController extends Controller
 
 
     /**
-     * Display a listing of the resource.
+     * View Cards
      *
      * @return \Illuminate\Http\Response
      */
@@ -46,49 +58,6 @@ class KanbanController extends Controller
         );
     }
 
-    // /**
-    //  * Show the form for creating a new resource.
-    //  *
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function create()
-    // {
-    //     //
-    // }
-
-    // /**
-    //  * Store a newly created resource in storage.
-    //  *
-    //  * @param  \Illuminate\Http\Request  $request
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function store(Request $request)
-    // {
-    //     //
-    // }
-
-    // /**
-    //  * Display the specified resource.
-    //  *
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function show($id)
-    // {
-    //     //
-    // }
-
-    // /**
-    //  * Show the form for editing the specified resource.
-    //  *
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function edit($id)
-    // {
-    //     //
-    // }
-
     /**
      * Faz a movimentação dos cards
      *
@@ -96,7 +65,7 @@ class KanbanController extends Controller
     public function update()
     {
         $id = (!empty($_POST['id']) ? filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT) : null);
-        $action = (!empty($_POST['action']) && in_array($_POST['action'], ['back', 'next']) ? $_POST['action'] : null); 
+        $action = (!empty($_POST['action']) && in_array($_POST['action'], ['back', 'next']) ? $_POST['action'] : null);
 
         $obj = new Kanban;
         if (!$obj->movement($id, $action)) {
@@ -108,14 +77,24 @@ class KanbanController extends Controller
         return $this->getApp();
     }
 
-    // /**
-    //  * Remove the specified resource from storage.
-    //  *
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function destroy($id)
-    // {
-    //     //
-    // }
+    /**
+     * Mostrar card
+     *
+     * @return void
+     */
+    public function show()
+    {
+        $id = (!empty($_POST['id_card']) ? filter_var($_POST['id_card'], FILTER_SANITIZE_NUMBER_INT) : null);
+        $cards = (new Kanban)->findByCard($id);
+
+        if (empty($cards)) {
+            $json['html']['.msg'] = '<div class="alert alert-danger" role="alert">Nenhum registro encontrado</div>';
+            echo json_encode($json);
+            return;
+        }
+        $json = Kanban::showCard($cards);
+        $json['modal']['#form-card'] = 'show';
+        echo json_encode($json);
+        return;
+    }
 }

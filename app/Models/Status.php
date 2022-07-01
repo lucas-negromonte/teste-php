@@ -19,12 +19,7 @@ class Status extends Model
      */
     public function getWithTheTotal(): ?Collection
     {
-        $results = DB::table('teste_php.status')
-            ->selectRaw('status.* , COUNT(DISTINCT card.id_card) AS total_cards ')
-            ->leftJoin('teste_php.card', 'card.id_status', '=', 'status.id_status')
-            ->groupByRaw('status.id_status')
-            ->get();
-
+        $results = DB::table('teste_php.status')->selectRaw('status.*')->groupByRaw('status.id_status')->get();
         return (!empty($results->count()) ? $results : null);
     }
 }
