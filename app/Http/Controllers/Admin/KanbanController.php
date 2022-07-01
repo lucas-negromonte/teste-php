@@ -90,41 +90,20 @@ class KanbanController extends Controller
     // }
 
     /**
-     * Update the specified resource in storage.
+     * Faz a movimentação dos cards
      *
      */
     public function update()
     {
         $id = (!empty($_POST['id']) ? filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT) : null);
-        $action = (!empty($_POST['action']) && in_array($_POST['action'], ['back', 'next']) ? $_POST['action'] : null);
-        if (empty($id) || empty($action)) {
-            $json['html']['.msg'] = '<div class="alert alert-warning" role="alert">Faltam dados</div>';
+        $action = (!empty($_POST['action']) && in_array($_POST['action'], ['back', 'next']) ? $_POST['action'] : null); 
+
+        $obj = new Kanban;
+        if (!$obj->movement($id, $action)) {
+            $json['html']['.msg'] = '<div class="alert alert-danger" role="alert">' . $obj->message . '</div>';
             echo json_encode($json);
             return;
         }
-
-        $card = Card::where('id_card', '=', $id)->first();
-        if (empty($card)) {
-            $json['html']['.msg'] = '<div class="alert alert-warning" role="alert">Card não encontrado</div>';
-            echo json_encode($json);
-            return;
-        }
-
-        $new_status = Status::where('id_status', ($action == 'back' ? '<' : '>'), $card->id_status)->orderByRaw(($action == 'back' ? 'id_status DESC' : 'id_status ASC'))->first();
-
-        if (empty($new_status)) {
-            $json['html']['.msg'] = '<div class="alert alert-warning" role="alert">Status não encontrado</div>';
-            echo json_encode($json);
-            return;
-        }
-
-        $card->id_status = $new_status->id_status;
-        $card->save();
-
-        (new CardMovement())->create([
-            'id_card' => $card->id_card,
-            'id_status' => $card->id_status,
-        ]);
 
         return $this->getApp();
     }

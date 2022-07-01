@@ -3,13 +3,18 @@
 namespace App\Support;
 
 use App\Models\Card;
+use App\Models\CardMovement;
 use App\Models\Material;
+use App\Models\Status;
 use App\Models\Teacher;
 use Illuminate\Support\Collection;
 
 
 class Kanban
 {
+
+    public $message;
+
     /**
      * Buscar todos os cards e outros objetos vinculados
      *
@@ -117,5 +122,45 @@ class Kanban
 
         $html .= '</div>';
         return $html;
+    }
+
+
+    /**
+     * faz a movimentação dos cards
+     *
+     * @param integer $id
+     * @param string $action
+     * @return boolean
+     */
+    public function movement(int $id, string $action): bool
+    {
+        $action = (in_array($action, ['back', 'next']) ? $action : null);
+        if (empty($id) || empty($action)) {
+            $this->message = 'Faltam dados';
+            return false;
+        }
+
+        $card = Card::where('id_card', '=', $id)->first();
+        if (empty($card)) {
+            $this->message = 'Card não encontrado';
+            return false;
+        }
+
+        $new_status = Status::where('id_status', ($action == 'back' ? '<' : '>'), $card->id_status)->orderByRaw(($action == 'back' ? 'id_status DESC' : 'id_status ASC'))->first();
+
+        if (empty($new_status)) {
+            $this->message = 'Status não encontrado';
+            return false;
+        }
+
+        $card->id_status = $new_status->id_status;
+        $card->save();
+
+        (new CardMovement())->create([
+            'id_card' => $card->id_card,
+            'id_status' => $card->id_status,
+        ]);
+
+        return true;
     }
 }
