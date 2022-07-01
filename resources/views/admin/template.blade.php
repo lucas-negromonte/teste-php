@@ -6,7 +6,7 @@
     <title>KANBAN</title>
     <meta charset="utf-8">
     <meta http-equiv="Expires" content="Mon, 26 Jul 1997 05:00:00 GMT" />
-    <meta http-equiv="Last-Modified" content="<?= gmdate('D, d M Y H:i:s') . ' GMT'; ?>" />
+    <meta http-equiv="Last-Modified" content="<?= gmdate('D, d M Y H:i:s') . ' GMT' ?>" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Cache-Control" content="post-check=0, pre-check=0" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -18,7 +18,8 @@
     <meta name="title" content="KANBAN" />
     <meta name="robots" content="noindex,nofollow" />
     <meta name="googlebot" content="noindex,nofollow" />
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <!-- Mobile device meta tags -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4" />
     <meta name="x-blackberry-defaultHoverEffect" content="false" />
@@ -38,13 +39,15 @@
             $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
-</head>
 
-<? flush(); ?>
+    @hasSection('css')
+        @yield('css')
+    @endif
+</head>
 
 <body>
 
-    <? include_once './formulario.php'; ?>
+    {{-- <? include_once './formulario.php'; ?> --}}
 
     <div class="container-fluid">
 
@@ -52,6 +55,10 @@
 
     </div>
 
+
+    @hasSection('js')
+        @yield('js')
+    @endif
 </body>
 
 </html>

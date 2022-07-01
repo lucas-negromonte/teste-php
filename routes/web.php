@@ -15,4 +15,6 @@ use Illuminate\Support\Facades\Route;
 */
 Route::controller(KanbanController::class)->name('web.')->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::post('/get-app', 'getApp')->name('index.post');
+        Route::post('/update-card', 'update')->name('index.update');
 });

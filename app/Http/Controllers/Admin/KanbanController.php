@@ -4,14 +4,29 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Card;
+use App\Models\CardMovement;
 use App\Models\Course;
 use App\Models\Status;
-use App\Models\Teacher;
+use App\Support\Kanban;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class KanbanController extends Controller
 {
+
+
+    public function getApp($data = null)
+    {
+        $statuses = (new Status)->getWithTheTotal();
+        $cards = (new Kanban)->getAllCards();
+        $html = Kanban::cards($cards, $statuses);
+        $json['html']['#app'] =  $html;
+        echo json_encode($json);
+        return;
+    }
+
+
+
+
     /**
      * Display a listing of the resource.
      *
@@ -19,74 +34,14 @@ class KanbanController extends Controller
      */
     public function index()
     {
-
-        $statuses = DB::table('teste_php.status')
-            ->selectRaw('status.* , COUNT(DISTINCT card.id_card) AS total_cards ')
-            ->leftJoin('teste_php.card', 'card.id_status', '=', 'status.id_status')
-            ->groupByRaw('status.id_status')
-            ->get();
-
-        $cards = DB::table('teste_php.card')
-            ->selectRaw('card.* ,curso.curso')
-            ->leftJoin('teste_php.curso', 'card.id_curso', '=', 'curso.id_curso')
-            ->leftJoin('teste_php.card_professor', 'card.id_card', '=', 'card_professor.id_card')
-            ->leftJoin('teste_php.professor', 'card_professor.id_professor', '=', 'professor.id_professor')
-            ->groupBy('card.id_card')
-            ->get();
-
-        $teachers = DB::table('teste_php.professor')
-            ->selectRaw('professor.* , card_professor.id_card ')
-            ->join('teste_php.card_professor', 'professor.id_professor', '=', 'card_professor.id_professor')
-            ->get();
-
-        $materials =  DB::table('teste_php.material')
-            ->selectRaw('material.* , card_material.id_card ')
-            ->join('teste_php.card_material', 'material.id_material', '=', 'card_material.id_material')
-            ->get();
-
-        if ($cards) {
-            foreach ($cards as $card) {
-                $card->professores = [];
-                $card->materiais = [];
-
-                // adicionar professores ao objeto card
-                if (!empty($teachers)) {
-                    foreach ($teachers as $teacher) {
-                        if (stristr($teacher->nome, ' ')) {
-                            $teacher->nome =  explode(' ',  $teacher->nome);
-                            $teacher->nome =  array_shift($teacher->nome) . ' ' . array_pop($teacher->nome);
-                        }
-
-                        $card->professores[] =  $teacher;
-                    }
-                }
-
-                // adicionar materials ao objeto card
-                if (!empty($materials)) {
-                    foreach ($materials as $material) {
-                        $card->materiais[] =  $material;
-                    }
-                }
-            }
-        }
-
-        $num_classes = Course::get();
-
-        $num_classes =  DB::table('teste_php.card')
-            ->selectRaw('count(card.num_aula) as total ')
-            ->groupBy('card.num_aula')
-            ->orderByRaw('count(card.num_aula)')
-            ->get();
-
-      
-
+        $statuses = (new Status)->getWithTheTotal();
         return view(
             'admin.kanban.index',
             [
-                'cards' => $cards,
+                // 'cards' => $cards,
                 'statuses' => $statuses,
                 'courses' => Course::get(),
-                'num_classes' => $num_classes,
+                'num_classes' =>  Card::select('num_aula')->groupBy('num_aula')->orderBy('num_aula')->get(),
             ]
         );
     }
@@ -134,17 +89,44 @@ class KanbanController extends Controller
     //     //
     // }
 
-    // /**
-    //  * Update the specified resource in storage.
-    //  *
-    //  * @param  \Illuminate\Http\Request  $request
-    //  * @param  int  $id
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function update(Request $request, $id)
-    // {
-    //     //
-    // }
+    /**
+     * Update the specified resource in storage.
+     *
+     */
+    public function update()
+    {
+        $id = (!empty($_POST['id']) ? filter_var($_POST['id'], FILTER_SANITIZE_NUMBER_INT) : null);
+        $action = (!empty($_POST['action']) && in_array($_POST['action'], ['back', 'next']) ? $_POST['action'] : null);
+        if (empty($id) || empty($action)) {
+            $json['html']['.msg'] = '<div class="alert alert-warning" role="alert">Faltam dados</div>';
+            echo json_encode($json);
+            return;
+        }
+
+        $card = Card::where('id_card', '=', $id)->first();
+        if (empty($card)) {
+            $json['html']['.msg'] = '<div class="alert alert-warning" role="alert">Card não encontrado</div>';
+            echo json_encode($json);
+            return;
+        }
+
+        $new_status = Status::where('id_status', ($action == 'back' ? '<' : '>'), $card->id_status)->first();
+        if (empty($new_status)) {
+            $json['html']['.msg'] = '<div class="alert alert-warning" role="alert">Status não encontrado</div>';
+            echo json_encode($json);
+            return;
+        }
+
+        $card->id_status = $new_status->id_status;
+        $card->save();
+
+        (new CardMovement())->create([
+            'id_card' => $card->id_card,
+            'id_status' => $card->id_status,
+        ]);
+        
+        return $this->getApp();
+    }
 
     // /**
     //  * Remove the specified resource from storage.

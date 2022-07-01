@@ -1,5 +1,9 @@
 @extends('admin.template')
 
+@section('js')
+    <script src="./assets/js/admin/kaban/app.js?{{ date('YmdHis') }}"></script>
+@endsection
+
 @section('content')
     <div class="row">
         <div class="col-sm-3">
@@ -22,7 +26,7 @@
                     <option value="" readonly>Todos</option>
                     @if (!empty($num_classes))
                         @foreach ($num_classes as $num_classe)
-                            <option value="{{ $num_classe->total }}">A{{ $num_classe->total }}</option>
+                            <option value="{{ $num_classe->num_aula }}">A{{ $num_classe->num_aula }}</option>
                         @endforeach
                     @endif
                 </select>
@@ -61,87 +65,8 @@
         </div>
     </div>
 
-    <div class="row card-colunas">
+    <div class="msg"></div>
+    <div id="app" data-url="{{ route('web.index.post') }}"></div>
 
-        @if (!empty($statuses))
-            @foreach ($statuses as $status)
-                <div class="col-sm-6 col-md-3">
-
-                    <div class="panel panel-primary coluna">
-                        <div class="panel-heading">
-                            <p class="panel-title">
-                                {{ $status->status }}
-                                <span class="badge badge-num-cards">{{ $status->total_cards }}</span>
-                            </p>
-                        </div>
-                        <div id="cards-{{ $status->id_status }}" class="panel-body">
-                            @include('admin.kanban.includes.card')
-                        </div>
-                    </div>
-
-                </div>
-            @endforeach
-        @endif
-        
-        {{-- <div class="col-sm-6 col-md-3">
-
-            <!-- MATERIAL RECEBIDO -->
-            <!-- *************************************************** -->
-
-            <div class="panel panel-info coluna">
-                <div class="panel-heading">
-                    <p class="panel-title">
-                        Material Recebido
-                        <span class="badge badge-num-cards">3</span>
-                    </p>
-                </div>
-                <div id="cards-material-recebido" class="panel-body">
-
-                    @include('admin.kanban.includes.card')
-
-                </div>
-            </div>
-
-        </div>
-        <div class="col-sm-6 col-md-3">
-
-            <!-- EM CONFERÊNCIA -->
-            <!-- *************************************************** -->
-
-            <div class="panel panel-danger coluna">
-                <div class="panel-heading">
-                    <p class="panel-title">
-                        Em Conferência
-                        <span class="badge badge-num-cards">3</span>
-                    </p>
-                </div>
-                <div id="cards-em-conferencia" class="panel-body">
-
-                    @include('admin.kanban.includes.card')
-
-                </div>
-            </div>
-
-        </div>
-        <div class="col-sm-6 col-md-3">
-
-            <!-- CONFERIDO -->
-            <!-- *************************************************** -->
-
-            <div class="panel panel-success coluna">
-                <div class="panel-heading">
-                    <p class="panel-title">
-                        Conferido
-                        <span class="badge badge-num-cards">3</span>
-                    </p>
-                </div>
-                <div id="cards-conferido" class="panel-body">
-
-                    @include('admin.kanban.includes.card')
-
-                </div>
-            </div> 
-
-        </div> --}}
-    </div>
+    
 @endsection

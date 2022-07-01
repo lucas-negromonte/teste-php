@@ -9,11 +9,4 @@ class Course extends Model
 {
     use HasFactory;
     protected $table = 'curso';
-
-
-    public function cards()
-    {
-        return $this->hasMany(Card::class, 'id_curso','id_curso');
-    }
-
 }

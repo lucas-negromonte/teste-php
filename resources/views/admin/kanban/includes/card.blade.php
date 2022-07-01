@@ -10,9 +10,7 @@
                             @if (!empty($card->professores))
                                 <div class="wrapper-professores">
                                     @foreach ($card->professores as $professor)
-                                        @if ($professor->id_card == $card->id_card)
-                                            <span class="label">{{ $professor->nome }}</span>
-                                        @endif
+                                        <span class="label">{{ $professor->nome }}</span>
                                     @endforeach
                                 </div>
                             @endif
@@ -29,11 +27,8 @@
 
                     @if (!empty($card->materiais))
                         @foreach ($card->materiais as $material)
-                            @if ($material->id_card == $card->id_card)
-                                <span class="glyphicon {{ $material->icone }}" data-toggle="tooltip"
-                                    data-placement="top" title="{{ $material->material }}"
-                                    style="margin-right: 6px"></span>
-                            @endif
+                            <span class="glyphicon {{ $material->icone }}" data-toggle="tooltip" data-placement="top"
+                                title="{{ $material->material }}" style="margin-right: 6px"></span>
                         @endforeach
                     @endif
 
@@ -44,10 +39,22 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li class="dropdown-header">Ações</li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#">&raquo; Prosseguir</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="#">&laquo; Voltar</a></li>
+                            @if ($status->id_status < $last_status)
+                                <li role="separator" class="divider"></li>
+                                <li>
+                                    <a style="cursor: pointer" data-id="{{ $card->id_card }}" data-update="true"
+                                        data-action="next" data-url="{{ route('web.index.update') }}">
+                                        &raquo; Prosseguir</a>
+                                </li>
+                            @endif
+                            @if ($status->id_status > $first_status)
+                                <li role="separator" class="divider"></li>
+                                <li>
+                                    <a style="cursor: pointer" data-id="{{ $card->id_card }}" data-update="true"
+                                        data-action="back" data-url="{{ route('web.index.update') }}">
+                                        &laquo; Voltar</a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
 
