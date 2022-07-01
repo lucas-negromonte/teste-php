@@ -74,5 +74,6 @@
     <div class="msg"></div>
     <div id="app" data-url="{{ route('web.index.post') }}"></div>
 
+    @include('admin.kanban.includes.form-card')
 
 @endsection

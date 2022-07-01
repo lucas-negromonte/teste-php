@@ -61,5 +61,13 @@ $(document).ready(function(e) {
                 $(key).html(value);
             }
         }
+
+        //  modal
+        if (response.modal) {
+            var arr = response.modal;
+            for (const [key, value] of Object.entries(arr)) {
+                $(key).modal(value);
+            }
+        }
     }
 });

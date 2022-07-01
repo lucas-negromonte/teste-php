@@ -15,14 +15,25 @@ class Kanban
 
     public $message;
 
+
+    /**
+     * Buscar card pelo ID
+     *
+     * @return Collection|null
+     */
+    public function findByCard(?int  $id_card = null): ?Collection
+    {
+        return $this->getAllCards(null, null, null, null, null, $id_card);
+    }
+
     /**
      * Buscar todos os cards e outros objetos vinculados
      *
      * @return Collection|null
      */
-    public function getAllCards(?string $order = null, ?string $order_type = null, ?int  $num_aula = null, ?int $id_curso = null, ?string  $teacher = null): ?Collection
+    public function getAllCards(?string $order = null, ?string $order_type = null, ?int  $num_aula = null, ?int $id_curso = null, ?string  $teacher = null, ?int $id_card = null): ?Collection
     {
-        $cards = (new Card())->getAllCards($order, $order_type, $num_aula, $id_curso, $teacher);
+        $cards = (new Card())->getAllCards($order, $order_type, $num_aula, $id_curso, $teacher, $id_card);
         if ($cards) {
             $teachers = (new Teacher())->getAllTeachers();
             $materials = (new Material())->getAllMaterials();
@@ -112,7 +123,7 @@ class Kanban
                 }
 
                 $html .= '<div class="col-sm-6 col-md-3">
-                            <div class="panel panel-primary coluna">
+                            <div class="panel panel-' . $status->cor . ' coluna">
                                 <div class="panel-heading">
                                     <p class="panel-title">
                                         ' . $status->status . '
@@ -206,5 +217,65 @@ class Kanban
         ]);
 
         return true;
+    }
+
+
+    /**
+     * Visualizar card
+     *
+     * @param  $cards
+     * @return array
+     */
+    public static function showCard($cards): array
+    {
+        $json = [];
+        if ($cards) {
+
+            foreach ($cards as $card) {
+                $json['html']['#form-card .professores'] = '';
+
+                if (!empty($card->professores)) {
+                    $html = '<div class="form-group">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#"><span class="glyphicon glyphicon-user"></span>
+                            Professor</a>
+                    </li>
+                </ul>';
+                    foreach ($card->professores as $professor) {
+                        $html .= ' <span class="label label-default">' . $professor->nome . '</span>';
+                    }
+                    $html .= '</div>';
+                    $json['html']['#form-card .professores'] = $html;
+                }
+
+                $json['html']['#form-card .materiais'] = '';
+                if (!empty($card->materiais)) {
+                    $html = '<div class="form-group">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#"><span class="glyphicon glyphicon-th-list"></span>
+                            Materiais</a>
+                    </li>
+                </ul>';
+                    foreach ($card->materiais as $material) {
+                        $html .= ' <span class="glyphicon ' . $material->icone . '" data-toggle="tooltip" data-placement="top"
+                    title="' . $material->material . '" style="margin-right: 6px"> ' . $material->material . '</span>';
+                    }
+                    $html .= '</div>';
+                    $json['html']['#form-card .materiais'] = $html;
+                }
+
+                // $teachers = 
+
+                $json['html']['#form-card .dt_registro'] = '<span class="glyphicon glyphicon-calendar"></span> ' . date('Y-m-d', strtotime($card->dt_registro)) . ' <span class="glyphicon glyphicon-time"></span> ' . date('H:i:s', strtotime($card->dt_registro));
+                $json['html']['#form-card .ano'] = $card->ano;
+                $json['html']['#form-card .num_aula'] = $card->num_aula;
+                $json['html']['#form-card .curso'] = ($card->id_tipo == 1 ? mb_strtoupper($card->curso) :  '<b class="text-success">AULÃO</b>');
+                $json['html']['#form-card .status'] = '<div class="col-sm-6 text-left">
+            <h4 class="status btn btn-' . $card->cor . '"><span>' . $card->status . '</span></h4>
+        </div>';
+            }
+        }
+
+        return $json;
     }
 }

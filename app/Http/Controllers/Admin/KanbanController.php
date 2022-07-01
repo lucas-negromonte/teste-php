@@ -76,4 +76,25 @@ class KanbanController extends Controller
 
         return $this->getApp();
     }
+
+    /**
+     * Mostrar card
+     *
+     * @return void
+     */
+    public function show()
+    {
+        $id = (!empty($_POST['id_card']) ? filter_var($_POST['id_card'], FILTER_SANITIZE_NUMBER_INT) : null);
+        $cards = (new Kanban)->findByCard($id);
+
+        if (empty($cards)) {
+            $json['html']['.msg'] = '<div class="alert alert-danger" role="alert">Nenhum registro encontrado</div>';
+            echo json_encode($json);
+            return;
+        }
+        $json = Kanban::showCard($cards);
+        $json['modal']['#form-card'] = 'show';
+        echo json_encode($json);
+        return;
+    }
 }

@@ -59,8 +59,7 @@
                         </ul>
                     </div>
 
-                    <a href="javascript:;" class="pull-right" data-toggle="modal" data-target="#form-card"
-                        style="margin-right: 10px">
+                    <a href="javascript:;" data-update="true" data-id_card="{{$card->id_card}}" data-url="{{ route('web.index.show') }}" class="pull-right" style="margin-right: 10px">
                         <span class="glyphicon glyphicon-eye-open"></span> Visualizar
                     </a>
 

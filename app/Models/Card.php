@@ -31,14 +31,15 @@ class Card extends Model
      *
      * @return Collection|null
      */
-    public function getAllCards(?string $order = null, ?string $order_type = null, ?int  $num_aula = null, ?int $id_curso = null, ?string $teacher = null): ?Collection
+    public function getAllCards(?string $order = null, ?string $order_type = null, ?int  $num_aula = null, ?int $id_curso = null, ?string $teacher = null,?int $id_card = null): ?Collection
     {
         $order = (!empty($order) && in_array($order, ['ano', 'curso', 'professor.nome', 'num_aula']) ? $order : 'card.id_card');
         $order_type = (!empty($order_type) && in_array($order_type, ['asc', 'desc']) ? $order_type : 'asc');
 
         $results =  DB::table('teste_php.card')
-            ->selectRaw('card.* ,curso.curso,card_professor.id_professor')
+            ->selectRaw('card.* ,curso.curso,card_professor.id_professor, status.status,status.cor')
             ->leftJoin('teste_php.curso', 'card.id_curso', '=', 'curso.id_curso')
+            ->leftJoin('teste_php.status', 'card.id_status', '=', 'status.id_status')
             ->leftJoin('teste_php.card_professor', 'card.id_card', '=', 'card_professor.id_card')
             ->leftJoin('teste_php.professor', 'card_professor.id_professor', '=', 'professor.id_professor');
 
@@ -52,6 +53,10 @@ class Card extends Model
 
         if (!empty($teacher)) {
             $results = $results->where('professor.nome', 'like', "%{$teacher}%");
+        }
+
+        if (!empty($id_card)) {
+            $results = $results->where('card.id_card', '=', $id_card);
         }
 
         $results =  $results->groupBy('card.id_card')->orderBy($order, $order_type)->get();
