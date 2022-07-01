@@ -110,7 +110,8 @@ class KanbanController extends Controller
             return;
         }
 
-        $new_status = Status::where('id_status', ($action == 'back' ? '<' : '>'), $card->id_status)->first();
+        $new_status = Status::where('id_status', ($action == 'back' ? '<' : '>'), $card->id_status)->orderByRaw(($action == 'back' ? 'id_status DESC' : 'id_status ASC'))->first();
+
         if (empty($new_status)) {
             $json['html']['.msg'] = '<div class="alert alert-warning" role="alert">Status não encontrado</div>';
             echo json_encode($json);
@@ -124,7 +125,7 @@ class KanbanController extends Controller
             'id_card' => $card->id_card,
             'id_status' => $card->id_status,
         ]);
-        
+
         return $this->getApp();
     }
 
